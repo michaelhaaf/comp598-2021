@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Input: ($1) an error message
 # Output: terminates the script, provides error message & script usage guide
