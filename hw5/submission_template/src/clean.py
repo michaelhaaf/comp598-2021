@@ -17,39 +17,68 @@
 import json, datetime
 import os, sys
 import argparse
-import record
 
-# parse command line arguments
-parser = argparse.ArgumentParser(description='json cleaner script')
-parser.add_argument('-i',
-        required=True,
-        help='input file name. Should be a .json file',
-        type=str,
-        dest='inputFile'
-        )
-parser.add_argument('-o',
-        required=True,
-        help='output file name. Should be a .json file',
-        type=str,
-        dest='outputFile'
-        )
-args = parser.parse_args()
+from src.record import Record, RecordFactory, RecordException
 
-# process input file
-in_file = open(args.inputFile, "r")
-input_data = in_file.readlines()
-in_file.close()
+from json.decoder import JSONDecodeError
 
-# process data
-# TODO: replace with list comprehension
-output_data = []
-for input_line in input_data:
-    output_line = Record.fromJson(input_line)
-    if output_line is not None:
-        output_data.append(output_line)
-        
-# produce output file
-out_file = open(args.outputFile, "w")
-out_file.writelines(output_data)
-out_file.close()
+def clean_record(input_string):
+    """Clean a JSON according to HW5 requirements.
+    Uses the Record class to enforce business logic
 
+    Keyword arguments:
+    input_string -- any string, if not a valid JSON, method will return None
+
+    Output:
+    - if record can be cleaned: a valid JSON string with clean data
+    - else, the None object will be returned 
+    """
+    result = None
+
+    try:
+        result = json.loads(input_string)
+    except JSONDecodeError as e:
+        print(e)
+
+    try:
+        result = RecordFactory.from_dictionary(result)
+    except RecordException as e:
+        print(e)
+
+    return result
+
+
+def main(args):
+
+    # process input file
+    in_file = open(args.inputFile, "r")
+    input_data = in_file.readlines()
+    in_file.close()
+
+    # process data
+    output_data = [clean_record(input_line) for input_line in input_data if clean_record(input_line) is not None]
+            
+    # produce output file
+    out_file = open(args.outputFile, "w")
+    out_file.writelines(output_data)
+    out_file.close()
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='json cleaner script')
+    parser.add_argument('-i',
+            required=True,
+            help='input file name. Should be a .json file',
+            type=str,
+            dest='inputFile'
+            )
+    parser.add_argument('-o',
+            required=True,
+            help='output file name. Should be a .json file',
+            type=str,
+            dest='outputFile'
+            )
+    args = parser.parse_args()
+
+    main(args)
