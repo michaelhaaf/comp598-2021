@@ -17,8 +17,9 @@
 import json, datetime
 import os, sys
 import argparse
+import logging
 
-from src.record import Record, RecordFactory, RecordException
+from src.record import Record, RecordFactory, RecordException, RecordEncoder
 
 from json.decoder import JSONDecodeError
 
@@ -33,19 +34,19 @@ def clean_record(input_string):
     - if record can be cleaned: a valid JSON string with clean data
     - else, the None object will be returned 
     """
-    result = None
-
     try:
-        result = json.loads(input_string)
+        input_dict = json.loads(input_string)
     except JSONDecodeError as e:
-        print(e)
+        logging.info(f"Invalid JSON: {input_string}", e)
+        return None
 
     try:
-        result = RecordFactory.from_dictionary(result)
+        record = RecordFactory.from_dictionary(input_dict)
     except RecordException as e:
-        print(e)
+        logging.info("Invalid input_dict: {input_dict}", e)
+        return None
 
-    return result
+    return json.dumps(record, cls=RecordEncoder)
 
 
 def main(args):

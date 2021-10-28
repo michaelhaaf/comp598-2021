@@ -1,12 +1,9 @@
 import datetime
+from datetime import timezone
+from json import JSONEncoder
 
 class Record:
-    ## Record-level requiremetns:
-    # 1. no title nor title_text field == toast
-    # 4. invalid datetime (ISO stantard)
-    # 6. no author field / empty null N/A author field
-    # 7. cannot cast total_count to int OR type not in int, float, str. BUT if total_count not present it's fine
-    # 
+    
 
     def __init__(self, title, author, createdAt, text="", total_count=0, tags=[]):
         self.title = title
@@ -18,15 +15,23 @@ class Record:
 
 
     @property
+    def createdAt(self):
+        return self._createdAt
+
+    @createdAt.setter
     def createdAt(self, value):
-        # str_format="%Y-%m-%dT%H:%M:%S"
+        str_format="%Y-%m-%dT%H:%M:%S%z"
         try: 
-            self._createdAt = datetime.datetime.fromisoformat(value).isoformat() 
+            self._createdAt = str(datetime.datetime.strptime(value, str_format).astimezone(tz=timezone.utc))
         except ValueError as e:
             raise RecordException("createdAt attribute must be a valid ISO datetime string", e)
 
     
     @property
+    def total_count(self):
+        return self._total_count
+
+    @total_count.setter
     def total_count(self, value):
         if not isinstance(value, (str, int, float)):
             raise RecordException("total_count attribute must be a str, int, or float")
@@ -38,18 +43,25 @@ class Record:
 
 
     @property
+    def tags(self):
+        return self._tags
+
+    @tags.setter
     def tags(self, value):
         self._tags = [split_tag for tag in value for split_tag in tag.split(' ')]
 
 
     @property
+    def author(self):
+        return self._author
+
+    @author.setter
     def author(self, value):
-    
-        if value:
+        
+        if value and value != "N/A":
             self._author = value
         else:
             raise RecordException("author attribute cannot be empty/null")
-
 
 
 class RecordException(Exception):
@@ -59,5 +71,17 @@ class RecordException(Exception):
 class RecordFactory:
 
     def from_dictionary(json_dict):
-        return Record(**json_dict)
+        if 'title_text' in json_dict:
+            json_dict['title'] = json_dict.pop('title_text')
+
+        try:
+            return Record(**json_dict)
+        except TypeError as e:
+            raise RecordException("missing required attributes", e)
     
+
+class RecordEncoder(JSONEncoder):
+    
+        def default(self, o):
+            # custom encoder inspired by https://stackoverflow.com/a/31813203
+            return {k.lstrip('_'): v for k, v in vars(o).items()}

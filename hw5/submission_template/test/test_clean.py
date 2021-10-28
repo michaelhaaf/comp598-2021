@@ -94,10 +94,11 @@ class CleanTest(unittest.TestCase):
             test6_record = f.readline()
         
         # test  
-        expectation = None
-        result = clean_record(test6_record)
+        expectation = ["nba", "basketball", "game", "soccer"]
+        record_under_test = clean_record(test6_record)
 
-        # assert
+        # prepare for comparison then assert
+        result = json.loads(record_under_test)['tags']
         self.assertEqual(result, expectation)
         
     
