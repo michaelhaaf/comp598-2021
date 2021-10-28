@@ -1,27 +1,15 @@
-## Requirements
-# 1. Remove all posts that don't have title or or title_text
-# 2. Standardize createdAt to UTC
-# 3. Rename title_text field to title
-# 4. Remove posts that cannot be standardized to UTC
-# 5. Remove invalid JSON dicts
-# 6. Remove posts with empty/null/N/A author field
-# 7. total_count must be int, float, str. Cast float/str to int. If it cannot be int, remove.
-# 8. Remove posts where total_count is not int,float,str. Except, if total_count is missing, keep the JSON object.
-# 9. tags field needs to be list of words (but keep the record if tags is missing). Split words separated by spaces into two separate words ["football games"] -> ["football", "games"]
-# 10. Posts not flagged for removal should be written to output file in order they appear in input file.
-
-## Usage
-# python3 clean.py -i <input_file> -o <output_file>
-
-
 import json, datetime
 import os, sys
 import argparse
 import logging
 
-from src.record import Record, RecordFactory, RecordException, RecordEncoder
+from pathlib import Path
+parentdir = Path(__file__).parents[1]
+sys.path.append(parentdir)
 
+from src.record import Record, RecordFactory, RecordException, RecordEncoder
 from json.decoder import JSONDecodeError
+
 
 def clean_record(input_string):
     """Clean a JSON according to HW5 requirements.
@@ -65,6 +53,8 @@ def main(args):
     out_file.close()
 
 
+## Usage
+# python3 clean.py -i <input_file> -o <output_file>
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='json cleaner script')
