@@ -2,13 +2,12 @@ import json, datetime
 import os, sys
 import argparse
 import logging
-
-from pathlib import Path
-parentdir = Path(__file__).parents[1]
-sys.path.append(parentdir)
-
-from src.record import Record, RecordFactory, RecordException, RecordEncoder
 from json.decoder import JSONDecodeError
+
+# Python3: need to modify src.path to have consistent import behavior
+# see https://chrisyeh96.github.io/2017/08/08/definitive-guide-python-imports.html
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+from src.record import Record, RecordFactory, RecordException, RecordEncoder
 
 
 def clean_record(input_string):
