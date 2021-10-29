@@ -13,7 +13,7 @@ class CleanTest(unittest.TestCase):
     def setUp(self):
         self.test_dir = os.path.dirname(__file__)
 
-    # 1. hosts that don’t have either “title” or “title_text” should be removed.
+    # 1. posts that don’t have either “title” or “title_text” should be removed.
     def test_no_title_or_title_text_removed(self):
 
         # load test1 data
@@ -71,7 +71,7 @@ class CleanTest(unittest.TestCase):
         # assert
         self.assertEqual(result, expectation)
 
-    # 5. total_count is a string containing a cast-able number, total_count is cast to an int properly.
+    # 5. total_count is a string containing a NON cast-able number ("twelve"), total_count is NOT cast to an int properly, instead the record is DISCARDED.
     def test_non_castable_total_count_removed(self):
         # load test5 data
         fixture5_path = os.path.join(self.test_dir, 'fixtures', 'test_5.json')
@@ -101,6 +101,26 @@ class CleanTest(unittest.TestCase):
         result = json.loads(record_under_test)['tags']
         self.assertEqual(result, expectation)
         
+    ### MY CUSTOM TESTS ###
+
+    # 7. Objects with 'title_text' field have field renamed to 'title'
+
+    # 8. createdAt date time is standardized to UTC 
+
+    # 9. createdAt alternative datetime format is supported
+
+    # 10. Objects without 'author' field are removed
+
+    # 11. Objects with empty 'author' field are removed
+
+    # 12. Objects with null 'author' field are removed
+
+    # 13. Objects with non int/float/str total_count are removed
+
+    # 14. Objects with int/float/str total_count are cast to int
+
+    # 15. Objects without tags/total_count are kept in the output
+
     
 if __name__ == '__main__':
     unittest.main()
