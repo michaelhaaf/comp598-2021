@@ -39,16 +39,23 @@ def clean_record(input_string):
 def main(args):
 
     # process input file
+    print(f"Loading {args.inputFile} data...")
     in_file = open(args.inputFile, "r")
     input_data = in_file.readlines()
     in_file.close()
 
     # process data
+    print(f"Processing...")
     output_data = [clean_record(input_line) for input_line in input_data if clean_record(input_line) is not None]
-            
+
     # produce output file
+    print(f"Writing {args.outputFile} data...")
     out_file = open(args.outputFile, "w")
+
+    # Hack since readlines() strips \n and writelines() doesn't add \n (hate to see it!)
+    output_data = [line + "\n" for line in output_data]
     out_file.writelines(output_data)
+
     out_file.close()
 
 
