@@ -22,7 +22,7 @@ class Record:
     def createdAt(self, value):
         str_format="%Y-%m-%dT%H:%M:%S%z"
         try: 
-            self._createdAt = str(datetime.datetime.strptime(value, str_format).astimezone(tz=timezone.utc))
+            self._createdAt = datetime.datetime.strptime(value, str_format).astimezone(tz=timezone.utc).strftime(str_format)
         except ValueError as e:
             raise RecordException("createdAt attribute must be a valid ISO datetime string", e)
 
