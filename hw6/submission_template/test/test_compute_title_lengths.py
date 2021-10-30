@@ -16,7 +16,6 @@ class ComputeTitleLengthsTest(unittest.TestCase):
         
     def test_compute_title_lengths_correct_result_for_given_sample(self):
         print(f"Ensure compute_title_lengths.py computes correct average for given sample")
-        print(self.test_fixture_file_path)
 
         ## set up: provide sample file, which has 2 titles and an average length of :
         # title 1: "I see you choosing the hard way" -- 31 characters
@@ -27,7 +26,7 @@ class ComputeTitleLengthsTest(unittest.TestCase):
         args = parser.parse_args(argv)
         self.assertEqual(args.inputFile, self.test_fixture_file_path)
 
-        # test: using stdout capture
+        # test: using stdout capture. This is janky but does the trick
         capturedOutput = io.StringIO() 
         sys.stdout = capturedOutput    
         main(args)                      
