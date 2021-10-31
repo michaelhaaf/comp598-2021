@@ -1,37 +1,58 @@
 import os, sys
 import argparse
 import bs4
+import json
 
-# either get element from request or from cache if it exists
-# wait let's plan this:
-
-# if cache:
-#   - beautiful soup on person_page that's in cache
-# else:
-#   - wget in python???
-#   - CREATE HTML DUMP that "if cache" can use
-#   - beautifulsoup, /dating/
+from pathlib import Path
 
 
-def get_element(request):
+BASE_URL="http://whosdatedwho.com/dating/"
+ROOT_DIR = Path(__file__).parents[1].absolute()
 
-    if not os.path.exists(CACHE_FILE):
-        root_element = request.json()
-        with open(CACHE_FILE, 'w') as fh:
-            json.dump(root_element, fh)
-    else:
-        print('Loading from cache')
-        with open(CACHE_FILE, 'r') as fh:
-            root_element = json.load(fh)
 
-    return root_element
+def populate_cache_dir(config_dict):
+    cache_loc = os.path.join(ROOT_DIR, config_dict['cache_dir'])
 
-def main(args):
-    soup = bs4.BeautifulSoup(open(args.person_page_fname, 'r'), 'html.parser')
+    p = Path(os.path.join(cache_loc))
+    p.mkdir(parents=True, exist_ok=True)
+    
+    cmds = [f"wget {BASE_URL + person} -O {os.path.join(cache_loc, person)}" for person in config_dict['target_people']]
+    run_cmds = lambda cmd: os.system(cmd)
+    
+    map(run_cmds, cmds)
+    return None
 
+
+def extract_page_files_from_cache(config_dict):
+    return {}
+
+
+def get_relationships(person_page_fname):
+    soup = bs4.BeautifulSoup(open(person_page_fname, 'r'), 'html.parser')
     age_div = soup.find('div', 'age')
     fact_div = age_div.find('div', 'fact')
-    print(fact_div.string)
+    return [fact_div.string]
+
+
+def main(args):
+
+    # read config file to dict
+    with open(args.configFile, 'r') as fh:
+        config_dict = json.load(fh)
+
+    # if cache_dir doesn't exist, create it (dl file for each target person)
+    ## TODO: refactor to method, so that actors are actually looked at
+    # if not os.path.exists(config_dict['cache_dir']):
+        populate_cache_dir(config_dict)
+
+    person_file_map = extract_page_files_from_cache(config_dict)
+
+    # for each target person, read info from cache.
+    output = { person: get_relationships(person_page_fname) for person, person_page_fname in person_file_map.items() }
+
+    # publish dict to json
+    with open(args.outputFile, 'w') as fh:
+        json.dump(output, fh)
 
 
 ## Usage
