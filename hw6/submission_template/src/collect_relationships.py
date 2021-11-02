@@ -35,12 +35,19 @@ def extract_page_files_from_cache(config_dict):
 
 
 def get_relationships(person_page_fname):
+
+
+
     soup = bs4.BeautifulSoup(open(person_page_fname, 'r'), 'html.parser')
-    age_div = soup.find('div', 'dating-history')
-    print(age_div)
-    fact_div = age_div.findAll('li')
-    print(fact_div)
-    return [fact_div.string]
+    data = soup.select("[type='application/ld+json']")[0]
+    oJson = json.loads(data.text)["itemListElement"]
+    numRelations = len(oJson)
+    results = []
+
+    for product in oJson:
+        results.append(product['item']['name'])
+
+    return results
 
 
 def main(args):
