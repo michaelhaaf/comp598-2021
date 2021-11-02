@@ -2,6 +2,8 @@ import os, sys
 import argparse
 import bs4
 import json
+import requests
+import shutil
 
 from pathlib import Path
 
@@ -16,21 +18,28 @@ def populate_cache_dir(config_dict):
     p = Path(os.path.join(cache_loc))
     p.mkdir(parents=True, exist_ok=True)
     
-    cmds = [f"wget {BASE_URL + person} -O {os.path.join(cache_loc, person)}" for person in config_dict['target_people']]
-    run_cmds = lambda cmd: os.system(cmd)
-    
-    map(run_cmds, cmds)
+    for person in config_dict['target_people']: 
+        person_page_fname = os.path.join(cache_loc, person)
+        print(f"Downloading whodatedwho info for {person} to location {person_page_fname}...")
+        with requests.get(BASE_URL + person, stream=True) as r:
+            with open(person_page_fname, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+        print(f"Download successful for {person} to {person_page_fname}!")
+
     return None
 
 
 def extract_page_files_from_cache(config_dict):
-    return {}
+    cache_loc = os.path.join(ROOT_DIR, config_dict['cache_dir'])
+    return {person : os.path.join(cache_loc, person) for person in config_dict['target_people']} 
 
 
 def get_relationships(person_page_fname):
     soup = bs4.BeautifulSoup(open(person_page_fname, 'r'), 'html.parser')
-    age_div = soup.find('div', 'age')
-    fact_div = age_div.find('div', 'fact')
+    age_div = soup.find('div', 'dating-history')
+    print(age_div)
+    fact_div = age_div.findAll('li')
+    print(fact_div)
     return [fact_div.string]
 
 
@@ -41,9 +50,11 @@ def main(args):
         config_dict = json.load(fh)
 
     # if cache_dir doesn't exist, create it (dl file for each target person)
-    ## TODO: refactor to method, so that actors are actually looked at
-    # if not os.path.exists(config_dict['cache_dir']):
+    print(f"Checking cache at {config_dict['cache_dir']}...")
+    if not os.path.exists(config_dict['cache_dir']):
+        print(f"No cache found at {config_dict['cache_dir']}, populating cache by downloading from {BASE_URL}...")
         populate_cache_dir(config_dict)
+    print(f"Cache found, extracting relationship data...")
 
     person_file_map = extract_page_files_from_cache(config_dict)
 
@@ -56,7 +67,7 @@ def main(args):
 
 
 ## Usage
-# python3 collection_relationships.py -c <config-file.json> -o <output_file.json>
+# python3 collect_relationships.py -c <config-file.json> -o <output_file.json>
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='collects relationships for target people given in input json file. see args for details')
