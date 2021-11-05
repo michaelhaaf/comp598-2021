@@ -18,7 +18,7 @@ def main(args):
         k = len(input_data)
 
     print(f"Selecting {k} random posts from {args.json_file}...")
-    chosen_posts = random.choices(input_data, k=k)
+    chosen_posts = random.sample(input_data, k)
 
     # Write tsv file
     print(f"Writing random selected posts to {args.out_file}...")
