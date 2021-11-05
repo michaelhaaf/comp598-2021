@@ -1,13 +1,35 @@
 import argparse
 import json
 import os, sys
-
+import random
+import csv
 
 def main(args):
-    print(args.out_file)
-    print(args.json_file)
-    print(args.num_posts_to_output)
+    
+    # process input file
+    print(f"Loading posts from {args.json_file}...")
+    with open(args.json_file, "r") as in_file:
+        input_data = [json.loads(line) for line in in_file]
 
+    # random selection of k elements
+    if len(input_data) > args.num_posts_to_output:
+        k = args.num_posts_to_output
+    else:
+        k = len(input_data)
+
+    print(f"Selecting {k} random posts from {args.json_file}...")
+    chosen_posts = random.choices(input_data, k=k)
+
+    # Write tsv file
+    print(f"Writing random selected posts to {args.out_file}...")
+    with open(args.out_file, 'wt') as out_file:
+        tsv_writer = csv.writer(out_file, delimiter='\t')
+        tsv_writer.writerow(['Name', 'title', 'coding'])
+        for line in chosen_posts:
+            tsv_writer.writerow([line['data']['name'], line['data']['title'], ''])
+
+    print("Finished!")
+    
 
 ## Usage
 # python3 extract_to_tsv.py -o <out_file> <json_file> <num_posts_to_output>
@@ -27,7 +49,7 @@ if __name__ == "__main__":
             )
     parser.add_argument(
             help='number of posts to output',
-            type=str,
+            type=int,
             dest='num_posts_to_output'
             )
     args = parser.parse_args()
