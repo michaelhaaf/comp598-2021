@@ -10,7 +10,7 @@ CLIENT_SECRET = "qlYhkEfImnvpVW9vFmmzc0B07KwR_Q"
 CLIENT_UN = "FairNeedleworker9516"
 CLIENT_PW = "JLRMmZ'a0;W6fC?X)B*w/Qt&a"
 
-BASE_URL = "https://oauth.reddit.com/r/"
+BASE_URL = "https://oauth.reddit.com"
 NUM_POSTS = 100
 
 def auth_request():
@@ -44,9 +44,16 @@ def get_top_posts_from_subreddit(subreddit):
 def dump_top_posts_from_subreddit_to_file(filename, subreddit):
     print(f"Grabbing newest {NUM_POSTS} from subreddit '{subreddit}', storing in {filename}...")
     posts = get_top_posts_from_subreddit(subreddit)
-    with open(filename, 'w') as fh:
+    with safe_open_w(filename, 'w') as fh:
         fh.write("\n".join(json.dumps(post) for post in posts))
     print(f"Finished grabbing posts and writing file!") 
+
+
+# helper method inspired by: https://stackoverflow.com/a/23794010
+# Open "path" for writing, creating any parent directories as needed.
+def safe_open_w(path, mode):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    return open(path, mode)
 
 
 def main(args):

@@ -22,7 +22,7 @@ def main(args):
 
     # Write tsv file
     print(f"Writing random selected posts to {args.out_file}...")
-    with open(args.out_file, 'wt') as out_file:
+    with safe_open_w(args.out_file, 'w') as out_file:
         tsv_writer = csv.writer(out_file, delimiter='\t')
         tsv_writer.writerow(['Name', 'title', 'coding'])
         for line in chosen_posts:
@@ -30,6 +30,13 @@ def main(args):
 
     print("Finished!")
     
+
+# helper method inspired by: https://stackoverflow.com/a/23794010
+# Open "path" for writing, creating any parent directories as needed.
+def safe_open_w(path, mode):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    return open(path, mode)
+
 
 ## Usage
 # python3 extract_to_tsv.py -o <out_file> <json_file> <num_posts_to_output>
