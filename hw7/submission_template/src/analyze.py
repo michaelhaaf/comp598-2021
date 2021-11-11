@@ -2,6 +2,7 @@ import argparse
 import json
 import os, sys
 import pandas as pd
+from pathlib import Path
 
 def main(args):
     
@@ -20,13 +21,20 @@ def main(args):
 
     # print to file/stddout
     if args.out_file:
-        with open(args.out_file, "w") as out_file:
+        with safe_open(args.out_file, "w") as out_file:
             json.dump(output_dict, out_file)
         print(f"Printed output to {args.out_file}")
     else:
         print(output_dict)
 
     
+# helper method inspired by: https://stackoverflow.com/a/23794010
+# Open "path" for writing, creating any parent directories as needed.
+def safe_open(filename, mode):
+    path = Path(filename).resolve()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    return open(path, mode)
+
 
 ## Usage
 # python3 analyze.py -i <coded_file.tsv> [-o <output_file>]

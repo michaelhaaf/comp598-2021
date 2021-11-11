@@ -3,6 +3,8 @@ import json
 import requests
 import requests.auth
 import os, sys
+from pathlib import Path
+
 
 # TODO: Hash these and unhash them to send
 CLIENT_ID = "5f5qHORUv3wF94Djz7QFfQ"
@@ -44,14 +46,15 @@ def get_top_posts_from_subreddit(subreddit):
 def dump_top_posts_from_subreddit_to_file(filename, subreddit):
     print(f"Grabbing newest {NUM_POSTS} from subreddit '{subreddit}', storing in {filename}...")
     posts = get_top_posts_from_subreddit(subreddit)
-    with safe_open_w(filename, 'w') as fh:
+    with safe_open(filename, 'w') as fh:
         fh.write("\n".join(json.dumps(post) for post in posts))
     print(f"Finished grabbing posts and writing file!") 
 
 
 # helper method inspired by: https://stackoverflow.com/a/23794010
 # Open "path" for writing, creating any parent directories as needed.
-def safe_open_w(path, mode):
+def safe_open(filename, mode):
+    path = Path(filename).resolve()
     os.makedirs(os.path.dirname(path), exist_ok=True)
     return open(path, mode)
 

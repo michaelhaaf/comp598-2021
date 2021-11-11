@@ -3,6 +3,8 @@ import json
 import os, sys
 import random
 import csv
+from pathlib import Path
+
 
 def main(args):
     
@@ -22,7 +24,7 @@ def main(args):
 
     # Write tsv file
     print(f"Writing random selected posts to {args.out_file}...")
-    with safe_open_w(args.out_file, 'w') as out_file:
+    with safe_open(args.out_file, 'w') as out_file:
         tsv_writer = csv.writer(out_file, delimiter='\t')
         tsv_writer.writerow(['Name', 'title', 'coding'])
         for line in chosen_posts:
@@ -33,7 +35,8 @@ def main(args):
 
 # helper method inspired by: https://stackoverflow.com/a/23794010
 # Open "path" for writing, creating any parent directories as needed.
-def safe_open_w(path, mode):
+def safe_open(filename, mode):
+    path = Path(filename).resolve()
     os.makedirs(os.path.dirname(path), exist_ok=True)
     return open(path, mode)
 
