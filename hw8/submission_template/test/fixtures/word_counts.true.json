@@ -1,10 +1,13 @@
 {
     "twilight sparkle": {
         "note" : 1,
-        "please" : 1,
-        "princess" : 1
+        "please" : 2,
+        "princess" : 1,
+        "pretty" : 2
     },
     "applejack" : {
+        "please" : 1,
+        "pretty" : 1,
         "oyes" : 2
     },
     "rarity" : {
