@@ -17,20 +17,33 @@ MIN_COUNT = 5
 STOP_WORDS = load_stop_words()  
 
 
-def keep(word):
-    return word.isalpha() and word not in STOP_WORDS
-
-
 def word_counts(df):
     word_counter = Counter()
     df['dialog'].apply(lambda dialog: word_counter.update(preprocess(dialog)))
-    return {word: count for (word, count) in word_counter.items() if count > MIN_COUNT}
+    return {word: count for (word, count) in word_counter.items()}
+
+
+def keep(word):
+    return word.isalpha() and word not in STOP_WORDS
 
 
 def preprocess(dialog):
     punctuation_table = str.maketrans(PUNCTUATION, ' ' * len(PUNCTUATION))
     return filter(keep, dialog.lower().translate(punctuation_table).split(' '))
 
+
+# is there an elegant way to do this requirement? fundamentally strange
+def postprocess(preprocessed_counts):
+    # first, count our "valid speech acts" across all preprocessed acts
+    overall_counter = Counter()
+    for pony_dict in preprocessed_counts.values():
+        overall_counter += Counter(pony_dict) 
+    words_to_remove = [word for word, count in overall_counter.items() if count < MIN_COUNT]
+
+    # create new counts without words < MIN_COUNT
+    return { pony: {word: count for (word, count) in pony_dict.items() if word not in words_to_remove} 
+            for pony, pony_dict in preprocessed_counts.items() }
+        
 
 def main(args):
     # read input csv and preprocess pony names
@@ -40,9 +53,10 @@ def main(args):
     # make word counts for each pony
     ponies = ["twilight sparkle", "applejack", "rarity", "pinkie pie", "rainbow dash", "fluttershy"]
     counts = {pony: word_counts(df[df.pony == pony]) for pony in ponies}
+    postprocessed_counts = postprocess(counts)
 
     out_file = open(args.outputFile, "w") 
-    json.dump(counts, out_file, indent=4)
+    json.dump(postprocessed_counts, out_file, indent=4)
     out_file.close() 
 
 
