@@ -7,16 +7,29 @@ import string
 import re
 from collections import Counter
 
+
 def load_stop_words():
     words = open("data/stopwords.txt", "r").read().split("\n")
     r = re.compile(r'^#')
     return {word for word in words if not bool(r.match(word))}
 
+
+PONIES = ["twilight sparkle", "applejack", "rarity", "pinkie pie", "rainbow dash", "fluttershy"]
 PUNCTUATION = '()[],-.?!;:#&'
 MIN_COUNT = 5
 STOP_WORDS = load_stop_words()  
 
 
+def load_data(path):
+    df = pd.read_csv(path)
+    df['pony'] = df['pony'].str.lower() 
+    return df 
+
+
+def compile_word_counts(df): 
+    return {pony: word_counts(df[df.pony == pony]) for pony in PONIES}
+
+    
 def word_counts(df):
     word_counter = Counter()
     df['dialog'].apply(lambda dialog: word_counter.update(preprocess(dialog)))
@@ -47,12 +60,10 @@ def postprocess(preprocessed_counts):
 
 def main(args):
     # read input csv and preprocess pony names
-    df = pd.read_csv(args.dialogFile)
-    df['pony'] = df['pony'].str.lower() 
+    df = load_data(args.dialogFile)
 
     # make word counts for each pony
-    ponies = ["twilight sparkle", "applejack", "rarity", "pinkie pie", "rainbow dash", "fluttershy"]
-    counts = {pony: word_counts(df[df.pony == pony]) for pony in ponies}
+    counts = compile_word_counts(df)
     postprocessed_counts = postprocess(counts)
 
     out_file = open(args.outputFile, "w") 
