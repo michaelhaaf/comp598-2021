@@ -6,21 +6,19 @@ import math
 
 def idf(word, pony_counts):
     # in progress
-    # ponies_that_used_word_count = reduce(lambda a, b: a+b, [1 for pony_counts.values()]) 
+    ponies_that_used_word_count = sum([1 for pony in pony_counts if word in pony_counts[pony]])
     return math.log( len(pony_counts.keys()) / ponies_that_used_word_count )
 
 
 def top_n_tf_idf(pony, pony_counts, n):
-    tf_idf_scores = { word: count * idf(word)  for word, count in pony_counts[pony].items() }
-    return ['word'] * n;
+    tf_idf_scores = { word: count * idf(word, pony_counts) for word, count in pony_counts[pony].items() }
+    return sorted(tf_idf_scores, key=lambda x: x[1], reverse=True)[0:n]
 
 
 def main(args):
     in_file = open(args.pony_counts, "r")
     pony_counts = json.load(in_file)
     in_file.close()
-
-    
 
     results = {pony: top_n_tf_idf(pony, pony_counts, args.num_words) for pony in pony_counts.keys()}
 
