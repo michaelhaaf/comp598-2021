@@ -7,7 +7,7 @@ import math
 def idf(word, pony_counts):
     # in progress
     ponies_that_used_word_count = sum([1 for pony in pony_counts if word in pony_counts[pony]])
-    return math.log( len(pony_counts.keys()) / ponies_that_used_word_count )
+    return math.log10( len(pony_counts.keys()) / ponies_that_used_word_count )
 
 
 def top_n_tf_idf(pony, pony_counts, n):
