@@ -1,8 +1,8 @@
 {
-    "twilight sparkle": ["princess", "pretty"],
-    "applejack" : [ "oyes", "pretty"],
+    "twilight sparkle": ["please", "pretty"],
+    "applejack" : [ "pretty", "oyes"],
     "rarity" : [ "oyes" ],
     "pinkie pie" : [ "oyes" ],
     "rainbow dash" : [ "oyes" ],
-    "fluttershy" : [ "lol", "okie" ]
+    "fluttershy" : [ "okie", "lol" ]
 }

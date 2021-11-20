@@ -11,7 +11,8 @@ def idf(word, pony_counts):
 
 def top_n_tf_idf(pony, pony_counts, n):
     tf_idf_scores = { word: count * idf(word, pony_counts) for word, count in pony_counts[pony].items() }
-    return sorted(tf_idf_scores, key=lambda x: x[1], reverse=True)[0:n]
+    return sorted(tf_idf_scores, key=tf_idf_scores.get, reverse=True)[0:n]
+
 
 def compute_pony_lang(pony_counts, num_words): 
     return {pony: top_n_tf_idf(pony, pony_counts, num_words) for pony in pony_counts.keys()}

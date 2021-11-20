@@ -5,7 +5,7 @@ parentdir = Path(__file__).parents[1]
 sys.path.append(parentdir)
 
 from src.compile_word_counts import load_data, compile_word_counts
-from src.compute_pony_lang import compute_pony_lang, idf
+from src.compute_pony_lang import compute_pony_lang, top_n_tf_idf, idf
 
 import pandas
 import math
@@ -41,30 +41,11 @@ class TasksTest(unittest.TestCase):
     def test_task2(self):
 
         # test
-        result = compute_pony_lang(self.true_word_counts_json, 2)
+        n = 2
+        result = compute_pony_lang(self.true_word_counts_json, n)
 
         # assert
         self.assertEqual(result, self.true_tf_idfs_json)
-
-        # extra idf computation tests
-        please_idf = idf("please", self.true_word_counts_json) 
-        pretty_idf = idf("pretty", self.true_word_counts_json) 
-        princess_idf = idf("princess", self.true_word_counts_json) 
-        note_idf = idf("note", self.true_word_counts_json) 
-        oyes_idf = idf("oyes", self.true_word_counts_json) 
-        okie_idf = idf("okie", self.true_word_counts_json) 
-        aaaaaaaa_idf = idf("aaaaaaaa", self.true_word_counts_json) 
-        lol_idf = idf("lol", self.true_word_counts_json) 
-
-        # assert 
-        self.assertEqual(please_idf, math.log10( 6 / 2 ) )
-        self.assertEqual(pretty_idf, math.log10( 6 / 2 ))
-        self.assertEqual(princess_idf, math.log10( 6 / 1 ))
-        self.assertEqual(note_idf, math.log10( 6 / 1 ))
-        self.assertEqual(oyes_idf, math.log10( 6 / 4 ))
-        self.assertEqual(okie_idf, math.log10( 6 / 1 ))
-        self.assertEqual(aaaaaaaa_idf, math.log10( 6 / 1 ))
-        self.assertEqual(lol_idf, math.log10( 6 / 1 ))
 
 
 if __name__ == '__main__':
