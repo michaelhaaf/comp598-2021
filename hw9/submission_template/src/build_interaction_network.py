@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import pandas as pd
-import numpy as np
 import json
 import argparse
 from collections import Counter
@@ -31,7 +30,6 @@ def build_network(df):
     character_list = build_char_list(df)
     network = initialize_network(character_list)
 
-    temp = 0
     table = df.iterrows()
     for (i, row1), (j, row2) in zip(table, table):
         if (is_connected(row1, row2, character_list)):
