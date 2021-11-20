@@ -27,7 +27,7 @@ def most_connected_by_weight(g):
     return sorted(node_weights, key=node_weights.get, reverse=True)[0:TOP_N]
 
 def most_connected_by_betweenness(g):
-    node_btwnness = {v: g.betweenness(v) for v in g.nodes()}
+    node_btwnness = nx.betweenness_centrality(g)
     return sorted(node_btwnness, key=node_btwnness.get, reverse=True)[0:TOP_N]
 
 
@@ -39,9 +39,10 @@ def main(args):
     network = {k: prune_connections(v) for k, v in network.items()}
     g = build_graph(network)
 
+
     stats = {
         "most_connected_by_num": most_connected_by_num(g),
-        "most_connected_by_weight": most_connected_by_weight(g)
+        "most_connected_by_weight": most_connected_by_weight(g),
         "most_central_by_betweenness": most_connected_by_betweenness(g)
     }
 
