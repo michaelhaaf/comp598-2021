@@ -6,7 +6,7 @@ import argparse
 from collections import Counter
 
 
-BLACKLIST = ["other", "ponies", "and", "all"]
+BLACKLIST = ["others", "ponies", "and", "all"]
 TOP_N_CHARS = 101
 
 
@@ -23,7 +23,8 @@ def build_char_list(df):
 
 
 def char_filter(char):
-    return not any(word in char[0] for word in BLACKLIST)
+    result = not any(word in char[0].split(" ") for word in BLACKLIST)
+    return result
 
 
 def build_network(df):
